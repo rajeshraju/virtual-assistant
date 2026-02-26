@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git fetch origin)",
+      "Bash(git commit --allow-empty -m \"Initial commit\")",
+      "Bash(git push -u origin main)",
+      "Bash(dotnet new webapi -n VirtualAssistant.Api --no-https false --use-controllers)",
+      "Bash(npm create vite@latest virtual-assistant-ui -- --template react-ts)"
+    ]
+  }
+}

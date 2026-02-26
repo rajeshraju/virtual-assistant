@@ -1,0 +1,6 @@
+@VirtualAssistant.Api_HostAddress = http://localhost:5139
+
+GET {{VirtualAssistant.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
