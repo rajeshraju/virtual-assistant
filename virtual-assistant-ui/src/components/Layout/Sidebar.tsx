@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
+import '../../styles/layout/Sidebar.less';
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
@@ -15,20 +16,22 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-gray-900 text-white flex flex-col h-screen fixed left-0 top-0">
-      <div className="px-6 py-5 border-b border-gray-700">
-        <h1 className="text-lg font-bold">Virtual Assistant</h1>
-        <p className="text-xs text-gray-400 mt-1">{user?.firstName} {user?.lastName}</p>
+    <aside className="sidebar">
+      <div className="sidebar__header">
+        <h1 className="sidebar__title">Virtual Assistant</h1>
+        <p className="sidebar__subtitle">
+          {user?.firstName} {user?.lastName}
+        </p>
         {user?.role === 'Admin' && (
-          <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded mt-1 inline-block">Admin</span>
+          <span className="sidebar__badge">Admin</span>
         )}
       </div>
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="sidebar__nav space-y-1">
         {links.filter(l => l.show).map(l => (
           <NavLink key={l.to} to={l.to}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                isActive ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'
+                isActive ? 'nav-link-active' : 'nav-link'
               }`
             }>
             <span>{l.icon}</span>
@@ -36,9 +39,9 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <div className="px-3 py-4 border-t border-gray-700">
+      <div className="sidebar__footer">
         <button onClick={logout}
-          className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800">
+          className="w-full text-left px-3 py-2 rounded-lg text-sm nav-link">
           Sign out
         </button>
       </div>

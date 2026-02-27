@@ -1,0 +1,51 @@
+@import (reference) '../variables.less';
+@import '../mixins.less';
+
+.appointments-page {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: @space-6;
+  }
+
+  &__title {
+    font-size: @text-2xl;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  &__table-wrap {
+    .table-wrap-base();
+  }
+
+  &__row {
+    cursor: pointer;
+    transition: background-color @transition-fast;
+
+    &:hover {
+      background-color: var(--table-header-bg);
+    }
+  }
+
+  &__contact-name {
+    color: var(--text-primary);
+  }
+
+  &__contact-phone {
+    font-size: @text-xs;
+    color: var(--text-muted);
+  }
+
+  &__status-badge {
+    font-size: @text-xs;
+    font-weight: 500;
+    padding: 2px @space-2;
+    border-radius: @radius-full;
+  }
+
+  &__reminder-label {
+    font-size: @text-xs;
+    color: var(--text-muted);
+  }
+}

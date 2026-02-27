@@ -7,11 +7,71 @@
 body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
-  background-color: #f9fafb;
-  color: #111827;
+  background-color: var(--page-bg);
+  color: var(--text-primary);
 }
 
-/* React Big Calendar base styles */
+/* ─── Theme CSS variables (defaults — overridden at runtime by ThemeContext) ── */
+
+:root {
+  --primary:          #2563eb;
+  --primary-dark:     #1d4ed8;
+  --primary-light:    #eff6ff;
+  --sidebar-bg:       #111827;
+  --sidebar-active:   #2563eb;
+  --sidebar-hover:    #1f2937;
+  --sidebar-text:     #d1d5db;
+  --sidebar-subtext:  #9ca3af;
+  --sidebar-border:   rgba(255,255,255,0.1);
+  --page-bg:          #f9fafb;
+  --card-bg:          #ffffff;
+  --text-primary:     #111827;
+  --text-muted:       #6b7280;
+  --border-color:     #e5e7eb;
+  --table-header-bg:  #f9fafb;
+  --input-bg:         #ffffff;
+}
+
+/* ─── Custom utilities → see src/styles/global.less ─────────────────────────── */
+
+/* ─── Dark-mode Tailwind overrides (applied when theme has isDark=true) ─────── */
+[data-dark] .bg-white {
+  background-color: var(--card-bg);
+}
+[data-dark] .bg-gray-50 {
+  background-color: var(--table-header-bg);
+}
+[data-dark] .text-gray-900 {
+  color: var(--text-primary);
+}
+[data-dark] .text-gray-800 {
+  color: var(--text-primary);
+}
+[data-dark] .text-gray-700 {
+  color: var(--text-primary);
+}
+[data-dark] .text-gray-600 {
+  color: var(--text-muted);
+}
+[data-dark] .text-gray-500 {
+  color: var(--text-muted);
+}
+[data-dark] .border {
+  border-color: var(--border-color);
+}
+[data-dark] .border-b,
+[data-dark] .divide-y > * {
+  border-color: var(--border-color);
+}
+[data-dark] input:not([type="checkbox"]):not([type="radio"]),
+[data-dark] select,
+[data-dark] textarea {
+  background-color: var(--input-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* ─── React Big Calendar base styles ───────────────────────────────────────── */
 .rbc-calendar {
   font-family: inherit;
 }

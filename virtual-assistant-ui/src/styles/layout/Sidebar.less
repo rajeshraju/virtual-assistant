@@ -1,0 +1,51 @@
+@import (reference) '../variables.less';
+
+.sidebar {
+  width: @sidebar-width;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: @z-sidebar;
+  background-color: var(--sidebar-bg);
+
+  &__header {
+    padding: @space-5 @space-6;
+    border-bottom: 1px solid var(--sidebar-border);
+  }
+
+  &__title {
+    font-size: @text-lg;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  &__subtitle {
+    font-size: @text-xs;
+    margin-top: @space-1;
+    color: var(--sidebar-subtext);
+  }
+
+  &__badge {
+    font-size: @text-xs;
+    color: #ffffff;
+    padding: 2px @space-2;
+    border-radius: @radius-full;
+    margin-top: @space-1;
+    display: inline-block;
+    background-color: var(--primary);
+  }
+
+  &__nav {
+    flex: 1;
+    padding: @space-4 @space-3;
+    overflow-y: auto;
+  }
+
+  &__footer {
+    padding: @space-4 @space-3;
+    border-top: 1px solid var(--sidebar-border);
+  }
+}

@@ -119,6 +119,79 @@ using (var scope = app.Services.CreateScope())
             db.SaveChanges();
         }
     }
+
+    // Seed built-in themes
+    SeedBuiltInThemes(db);
+}
+
+static void SeedBuiltInThemes(VirtualAssistant.Api.Data.AppDbContext db)
+{
+    var builtIn = new[]
+    {
+        new VirtualAssistant.Api.Models.Theme
+        {
+            Name = "Ocean", Slug = "ocean", IsBuiltIn = true, IsActive = true, IsDark = false,
+            Primary = "#2563eb", PrimaryDark = "#1d4ed8", PrimaryLight = "#eff6ff",
+            SidebarBg = "#111827", SidebarActive = "#2563eb", SidebarHover = "#1f2937",
+            SidebarText = "#d1d5db", SidebarSubtext = "#9ca3af", SidebarBorder = "rgba(255,255,255,0.1)",
+            PageBg = "#f9fafb", CardBg = "#ffffff", TextPrimary = "#111827", TextMuted = "#6b7280",
+            BorderColor = "#e5e7eb", TableHeaderBg = "#f9fafb", InputBg = "#ffffff",
+        },
+        new VirtualAssistant.Api.Models.Theme
+        {
+            Name = "Midnight", Slug = "midnight", IsBuiltIn = true, IsActive = false, IsDark = true,
+            Primary = "#818cf8", PrimaryDark = "#6366f1", PrimaryLight = "#312e81",
+            SidebarBg = "#030712", SidebarActive = "#3730a3", SidebarHover = "#111827",
+            SidebarText = "#9ca3af", SidebarSubtext = "#6b7280", SidebarBorder = "rgba(255,255,255,0.06)",
+            PageBg = "#111827", CardBg = "#1f2937", TextPrimary = "#f3f4f6", TextMuted = "#9ca3af",
+            BorderColor = "#374151", TableHeaderBg = "#111827", InputBg = "#374151",
+        },
+        new VirtualAssistant.Api.Models.Theme
+        {
+            Name = "Forest", Slug = "forest", IsBuiltIn = true, IsActive = false, IsDark = false,
+            Primary = "#059669", PrimaryDark = "#047857", PrimaryLight = "#ecfdf5",
+            SidebarBg = "#064e3b", SidebarActive = "#065f46", SidebarHover = "#065f46",
+            SidebarText = "#a7f3d0", SidebarSubtext = "#6ee7b7", SidebarBorder = "rgba(255,255,255,0.1)",
+            PageBg = "#f0fdf4", CardBg = "#ffffff", TextPrimary = "#111827", TextMuted = "#6b7280",
+            BorderColor = "#d1fae5", TableHeaderBg = "#ecfdf5", InputBg = "#ffffff",
+        },
+        new VirtualAssistant.Api.Models.Theme
+        {
+            Name = "Sunset", Slug = "sunset", IsBuiltIn = true, IsActive = false, IsDark = false,
+            Primary = "#ea580c", PrimaryDark = "#c2410c", PrimaryLight = "#fff7ed",
+            SidebarBg = "#1c1917", SidebarActive = "#7c2d12", SidebarHover = "#292524",
+            SidebarText = "#d6d3d1", SidebarSubtext = "#a8a29e", SidebarBorder = "rgba(255,255,255,0.1)",
+            PageBg = "#fff7ed", CardBg = "#ffffff", TextPrimary = "#111827", TextMuted = "#6b7280",
+            BorderColor = "#fed7aa", TableHeaderBg = "#fff7ed", InputBg = "#ffffff",
+        },
+        new VirtualAssistant.Api.Models.Theme
+        {
+            Name = "Lavender", Slug = "lavender", IsBuiltIn = true, IsActive = false, IsDark = false,
+            Primary = "#9333ea", PrimaryDark = "#7e22ce", PrimaryLight = "#faf5ff",
+            SidebarBg = "#0f172a", SidebarActive = "#6b21a8", SidebarHover = "#1e293b",
+            SidebarText = "#cbd5e1", SidebarSubtext = "#94a3b8", SidebarBorder = "rgba(255,255,255,0.1)",
+            PageBg = "#faf5ff", CardBg = "#ffffff", TextPrimary = "#111827", TextMuted = "#6b7280",
+            BorderColor = "#e9d5ff", TableHeaderBg = "#faf5ff", InputBg = "#ffffff",
+        },
+    };
+
+    foreach (var theme in builtIn)
+    {
+        if (!db.Themes.Any(t => t.Slug == theme.Slug))
+            db.Themes.Add(theme);
+    }
+
+    db.SaveChanges();
+
+    // Migrate old App.Theme setting: if one exists and no theme is active, activate that slug
+    if (!db.Themes.Any(t => t.IsActive))
+    {
+        var oldThemeSetting = db.SystemSettings.FirstOrDefault(s => s.Key == "App.Theme");
+        var slug = oldThemeSetting?.Value ?? "ocean";
+        var active = db.Themes.FirstOrDefault(t => t.Slug == slug) ?? db.Themes.First();
+        active.IsActive = true;
+        db.SaveChanges();
+    }
 }
 
 if (app.Environment.IsDevelopment())

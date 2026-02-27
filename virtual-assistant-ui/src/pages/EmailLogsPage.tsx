@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { getEmailLogs } from '../api/emailRulesApi';
 import type { EmailLog, PaginatedResponse } from '../types';
+import '../styles/pages/EmailLogs.less';
 
 export default function EmailLogsPage() {
   const [data, setData] = useState<PaginatedResponse<EmailLog>>({ total: 0, page: 1, pageSize: 20, items: [] });
@@ -14,10 +15,10 @@ export default function EmailLogsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Email Logs</h1>
-      <p className="text-sm text-gray-500 mb-4">{data.total} emails processed by IMAP polling</p>
+      <h1 className="email-logs-page__title">Email Logs</h1>
+      <p className="email-logs-page__subtitle">{data.total} emails processed by IMAP polling</p>
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="email-logs-page__table-wrap">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wide">
             <tr>
@@ -33,7 +34,7 @@ export default function EmailLogsPage() {
             {data.items.map(log => (
               <>
                 <tr key={log.id} onClick={() => setExpanded(expanded === log.id ? null : log.id)}
-                  className="cursor-pointer hover:bg-gray-50">
+                  className="email-logs-page__row">
                   <td className="px-4 py-3 text-gray-700">{log.from}</td>
                   <td className="px-4 py-3 font-medium text-gray-900">{log.subject}</td>
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
@@ -41,7 +42,7 @@ export default function EmailLogsPage() {
                   </td>
                   <td className="px-4 py-3">
                     {log.ruleMatchedName
-                      ? <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">{log.ruleMatchedName}</span>
+                      ? <span className="email-logs-page__rule-badge">{log.ruleMatchedName}</span>
                       : <span className="text-gray-400">—</span>}
                   </td>
                   <td className="px-4 py-3">
@@ -51,8 +52,8 @@ export default function EmailLogsPage() {
                   </td>
                 </tr>
                 {expanded === log.id && log.bodySnippet && (
-                  <tr key={`${log.id}-exp`} className="bg-gray-50">
-                    <td colSpan={5} className="px-4 py-3 text-sm text-gray-600 italic">
+                  <tr key={`${log.id}-exp`} className="email-logs-page__row-expanded">
+                    <td colSpan={5} className="px-4 py-3 email-logs-page__snippet">
                       {log.bodySnippet}
                     </td>
                   </tr>
@@ -64,7 +65,7 @@ export default function EmailLogsPage() {
       </div>
 
       {data.total > data.pageSize && (
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="email-logs-page__pagination">
           <button disabled={page === 1} onClick={() => setPage(p => p - 1)}
             className="px-3 py-1 border rounded text-sm disabled:opacity-40">Prev</button>
           <span className="px-3 py-1 text-sm text-gray-500">Page {page}</span>

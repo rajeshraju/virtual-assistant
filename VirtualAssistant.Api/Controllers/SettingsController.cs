@@ -102,6 +102,7 @@ public class SettingsController(
         await db.SaveChangesAsync();
         return await GetSettings();
     }
+
 }
 
 public class SaveSettingsRequest

@@ -1,0 +1,63 @@
+@import (reference) '../variables.less';
+@import '../mixins.less';
+
+.phone-calls-page {
+  &__title {
+    .page-title-base();
+  }
+
+  &__subtitle {
+    font-size: @text-sm;
+    color: var(--text-muted);
+    margin-bottom: @space-4;
+  }
+
+  &__table-wrap {
+    .table-wrap-base();
+  }
+
+  &__row {
+    cursor: pointer;
+    transition: background-color @transition-fast;
+
+    &:hover {
+      background-color: var(--table-header-bg);
+    }
+  }
+
+  &__row-expanded {
+    background-color: var(--table-header-bg);
+  }
+
+  &__transcript {
+    font-size: @text-sm;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  &__direction-badge {
+    font-size: @text-xs;
+    font-weight: 500;
+    padding: 2px @space-2;
+    border-radius: @radius-full;
+
+    &--inbound  { background-color: #dbeafe; color: #1e40af; }
+    &--outbound { background-color: #f3f4f6; color: #374151; }
+  }
+
+  &__recording-link {
+    color: var(--primary);
+    font-size: @text-xs;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__pagination {
+    display: flex;
+    justify-content: center;
+    gap: @space-2;
+    margin-top: @space-4;
+  }
+}

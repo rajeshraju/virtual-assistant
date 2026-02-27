@@ -4,6 +4,7 @@ import { getAppointments } from '../api/appointmentsApi';
 import { getPhoneCalls, getEmailLogs } from '../api/emailRulesApi';
 import type { Appointment } from '../types';
 import { format } from 'date-fns';
+import '../styles/pages/Dashboard.less';
 
 export default function DashboardPage() {
   const [upcoming, setUpcoming] = useState<Appointment[]>([]);
@@ -27,37 +28,37 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
+      <h1 className="dashboard__title">Dashboard</h1>
 
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-xl shadow-sm p-5 border">
-          <p className="text-sm text-gray-500">Upcoming (7 days)</p>
-          <p className="text-3xl font-bold text-blue-600 mt-1">{upcoming.length}</p>
+      <div className="dashboard__stat-grid">
+        <div className="dashboard__stat-card">
+          <p className="dashboard__stat-label">Upcoming (7 days)</p>
+          <p className="dashboard__stat-value text-primary-color">{upcoming.length}</p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-5 border">
-          <p className="text-sm text-gray-500">Total Calls</p>
-          <p className="text-3xl font-bold text-green-600 mt-1">{callCount}</p>
+        <div className="dashboard__stat-card">
+          <p className="dashboard__stat-label">Total Calls</p>
+          <p className="dashboard__stat-value text-green-600">{callCount}</p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-5 border">
-          <p className="text-sm text-gray-500">Emails Processed</p>
-          <p className="text-3xl font-bold text-purple-600 mt-1">{emailCount}</p>
+        <div className="dashboard__stat-card">
+          <p className="dashboard__stat-label">Emails Processed</p>
+          <p className="dashboard__stat-value text-purple-600">{emailCount}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border">
-        <div className="flex items-center justify-between px-5 py-4 border-b">
-          <h2 className="font-semibold text-gray-800">Upcoming Appointments</h2>
-          <Link to="/calendar" className="text-sm text-blue-600 hover:underline">View calendar →</Link>
+      <div className="dashboard__upcoming">
+        <div className="dashboard__upcoming-header">
+          <h2 className="dashboard__upcoming-title">Upcoming Appointments</h2>
+          <Link to="/calendar" className="dashboard__upcoming-link">View calendar →</Link>
         </div>
         {upcoming.length === 0 ? (
-          <p className="px-5 py-8 text-center text-gray-400">No upcoming appointments this week.</p>
+          <p className="dashboard__upcoming-empty">No upcoming appointments this week.</p>
         ) : (
-          <ul className="divide-y">
+          <ul>
             {upcoming.map(a => (
-              <li key={a.id} className="px-5 py-4 flex items-center justify-between">
+              <li key={a.id} className="dashboard__upcoming-item">
                 <div>
-                  <p className="font-medium text-gray-900">{a.title}</p>
-                  <p className="text-sm text-gray-500">{a.contactName} · {format(new Date(a.startTime), 'MMM d, h:mm aa')}</p>
+                  <p className="dashboard__upcoming-item-name">{a.title}</p>
+                  <p className="dashboard__upcoming-item-meta">{a.contactName} · {format(new Date(a.startTime), 'MMM d, h:mm aa')}</p>
                 </div>
                 <span className={`text-xs font-medium px-2 py-1 rounded-full ${statusColor[a.status] ?? 'bg-gray-100'}`}>
                   {a.status}

@@ -1,0 +1,18 @@
+@import (reference) '../variables.less';
+@import '../mixins.less';
+
+.calendar-page {
+  &__title {
+    .page-title-base();
+  }
+
+  &__container {
+    .card-base();
+    padding: @space-4;
+    height: 75vh;
+  }
+
+  &__inner {
+    height: 100%;
+  }
+}

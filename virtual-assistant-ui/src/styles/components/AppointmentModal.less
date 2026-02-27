@@ -1,0 +1,127 @@
+@import (reference) '../variables.less';
+@import '../mixins.less';
+
+.appt-modal {
+  &__overlay {
+    .modal-overlay-base();
+  }
+
+  &__panel {
+    .modal-panel-base();
+    max-width: 32rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: @space-4 @space-6;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  &__title {
+    font-size: @text-lg;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__mode-tabs {
+    display: flex;
+    gap: @space-2;
+    font-size: @text-sm;
+  }
+
+  &__mode-tab {
+    padding: @space-1 @space-3;
+    border-radius: @radius-md;
+    color: var(--text-muted);
+    transition: background-color @transition-fast, color @transition-fast;
+
+    &:hover {
+      background-color: var(--table-header-bg);
+    }
+
+    &--edit {
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    &--reschedule {
+      background-color: #fef9c3;
+      color: #a16207;
+    }
+  }
+
+  &__close {
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    margin-left: @space-4;
+    line-height: 1;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+
+  &__body {
+    padding: @space-4 @space-6;
+  }
+
+  &__footer {
+    padding: @space-4 @space-6;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: @space-3;
+    justify-content: space-between;
+  }
+
+  &__footer-left,
+  &__footer-right {
+    display: flex;
+    gap: @space-2;
+  }
+
+  &__label {
+    .form-label-base();
+  }
+
+  &__input {
+    .form-input-base();
+  }
+
+  &__select {
+    .form-input-base();
+    cursor: pointer;
+  }
+
+  &__textarea {
+    .form-input-base();
+    resize: vertical;
+  }
+
+  &__delete-btn {
+    font-size: @text-sm;
+    padding: @space-2 @space-3;
+    color: #dc2626;
+    border-radius: @radius-md;
+    transition: background-color @transition-fast;
+
+    &:hover {
+      background-color: #fef2f2;
+    }
+  }
+
+  &__reminder-btn {
+    font-size: @text-sm;
+    padding: @space-2 @space-3;
+    color: #7c3aed;
+    border-radius: @radius-md;
+    transition: background-color @transition-fast;
+
+    &:hover {
+      background-color: #f5f3ff;
+    }
+  }
+}

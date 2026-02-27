@@ -1,0 +1,52 @@
+@import (reference) '../variables.less';
+@import '../mixins.less';
+
+.email-logs-page {
+  &__title {
+    .page-title-base();
+  }
+
+  &__subtitle {
+    font-size: @text-sm;
+    color: var(--text-muted);
+    margin-bottom: @space-4;
+  }
+
+  &__table-wrap {
+    .table-wrap-base();
+  }
+
+  &__row {
+    cursor: pointer;
+    transition: background-color @transition-fast;
+
+    &:hover {
+      background-color: var(--table-header-bg);
+    }
+  }
+
+  &__row-expanded {
+    background-color: var(--table-header-bg);
+  }
+
+  &__snippet {
+    font-size: @text-sm;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  &__rule-badge {
+    background-color: #f3e8ff;
+    color: #7e22ce;
+    font-size: @text-xs;
+    padding: 2px @space-2;
+    border-radius: @radius-full;
+  }
+
+  &__pagination {
+    display: flex;
+    justify-content: center;
+    gap: @space-2;
+    margin-top: @space-4;
+  }
+}
