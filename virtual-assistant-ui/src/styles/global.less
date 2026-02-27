@@ -1,0 +1,42 @@
+@import (reference) './variables.less';
+@import './mixins.less';
+
+// ─── Primary button ───────────────────────────────────────────────────────────
+.btn-primary {
+  background-color: var(--primary);
+  color: #ffffff;
+  transition: background-color @transition-fast;
+
+  &:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ─── Color utilities ─────────────────────────────────────────────────────────
+.text-primary-color  { color: var(--primary); }
+.border-primary-color { border-color: var(--primary); }
+.bg-primary-light    { background-color: var(--primary-light); }
+.bg-card             { background-color: var(--card-bg); }
+.text-theme-muted    { color: var(--text-muted); }
+.border-theme        { border-color: var(--border-color); }
+
+// ─── Sidebar nav links ────────────────────────────────────────────────────────
+.nav-link {
+  color: var(--sidebar-text);
+  transition: background-color @transition-fast, color @transition-fast;
+
+  &:hover {
+    background-color: var(--sidebar-hover);
+    color: #ffffff;
+  }
+}
+
+.nav-link-active {
+  background-color: var(--sidebar-active);
+  color: #ffffff;
+}

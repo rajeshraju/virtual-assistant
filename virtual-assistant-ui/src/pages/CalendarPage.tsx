@@ -6,6 +6,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import type { Appointment } from '../types';
 import { getAppointments } from '../api/appointmentsApi';
 import AppointmentModal from '../components/Calendar/AppointmentModal';
+import '../styles/pages/Calendar.less';
 
 const localizer = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales: { 'en-US': enUS } });
 
@@ -44,19 +45,21 @@ export default function CalendarPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Appointment Calendar</h1>
-      <div className="bg-white rounded-xl shadow-sm border p-4" style={{ height: '75vh' }}>
-        <Calendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: '100%' }}
-          eventPropGetter={eventStyleGetter}
-          onSelectEvent={(ev: CalEvent) => setSelectedAppt(ev.resource)}
-          onSelectSlot={({ start, end }: { start: Date; end: Date }) => setNewSlot({ start, end })}
-          selectable
-        />
+      <h1 className="calendar-page__title">Appointment Calendar</h1>
+      <div className="calendar-page__container">
+        <div className="calendar-page__inner">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: '100%' }}
+            eventPropGetter={eventStyleGetter}
+            onSelectEvent={(ev: CalEvent) => setSelectedAppt(ev.resource)}
+            onSelectSlot={({ start, end }: { start: Date; end: Date }) => setNewSlot({ start, end })}
+            selectable
+          />
+        </div>
       </div>
 
       {selectedAppt && (

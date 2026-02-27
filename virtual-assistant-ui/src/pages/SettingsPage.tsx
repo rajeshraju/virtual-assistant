@@ -1,14 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import {
   listUsers, createUser, updateUser, deleteUser, resetPassword,
   getSettings, saveSettings,
   type AdminUserRequest, type SystemSettings,
 } from '../api/adminApi';
-import type { User } from '../types';
+import {
+  getThemes, createTheme, updateTheme, deleteTheme,
+  emptyThemeForm, type ThemeFormData,
+} from '../api/themesApi';
+import type { User, Theme } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
 import toast from 'react-hot-toast';
+import '../styles/pages/Settings.less';
 
-type Tab = 'users' | 'email' | 'phone';
+type Tab = 'users' | 'email' | 'phone' | 'appearance';
 
 // ── Shared ────────────────────────────────────────────────────────────────────
 
@@ -16,9 +22,7 @@ function TabButton({ label, active, onClick }: { label: string; active: boolean;
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-        active ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-      }`}
+      className={`settings-page__tab-btn ${active ? 'settings-page__tab-btn--active' : ''}`}
     >
       {label}
     </button>
@@ -126,16 +130,15 @@ function UsersTab() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">Users</h2>
+      <div className="settings-page__section-header">
+        <h2 className="settings-page__section-title">Users</h2>
         <button onClick={openCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+          className="btn-primary px-4 py-2 rounded-lg text-sm">
           + Add user
         </button>
       </div>
 
-      {/* User table */}
-      <div className="bg-white rounded-xl shadow overflow-hidden">
+      <div className="settings-page__table-wrap">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b">
             <tr>
@@ -150,9 +153,9 @@ function UsersTab() {
                 <td className="px-4 py-3">{u.firstName} {u.lastName}</td>
                 <td className="px-4 py-3 text-gray-500">{u.email}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                    u.role === 'Admin' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
-                  }`}>{u.role}</span>
+                  <span className={`settings-page__role-badge settings-page__role-badge--${u.role.toLowerCase()}`}>
+                    {u.role}
+                  </span>
                 </td>
                 <td className="px-4 py-3">{u.canViewEmails ? '✓' : '–'}</td>
                 <td className="px-4 py-3">{u.canViewCalls ? '✓' : '–'}</td>
@@ -160,7 +163,7 @@ function UsersTab() {
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
                     <button onClick={() => openEdit(u)}
-                      className="text-blue-600 hover:underline text-xs">Edit</button>
+                      className="text-primary-color hover:underline text-xs">Edit</button>
                     <button onClick={() => { setResetTarget(u); setNewPw(''); }}
                       className="text-yellow-600 hover:underline text-xs">Reset pw</button>
                     {u.id !== me?.id && (
@@ -175,40 +178,39 @@ function UsersTab() {
         </table>
       </div>
 
-      {/* Create / Edit modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-            <h3 className="text-lg font-semibold mb-4">{editing ? 'Edit user' : 'Add user'}</h3>
+        <div className="settings-page__modal-overlay">
+          <div className="settings-page__modal-panel" style={{ maxWidth: '28rem' }}>
+            <h3 className="settings-page__modal-title">{editing ? 'Edit user' : 'Add user'}</h3>
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <input required placeholder="First name" value={form.firstName}
                   onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))}
-                  className="border rounded-lg px-3 py-2 text-sm" />
+                  className="settings-page__modal-input" />
                 <input required placeholder="Last name" value={form.lastName}
                   onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))}
-                  className="border rounded-lg px-3 py-2 text-sm" />
+                  className="settings-page__modal-input" />
               </div>
               <input required type="email" placeholder="Email" value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
+                className="settings-page__modal-input" />
               <input placeholder="Phone (optional)" value={form.phoneNumber}
                 onChange={e => setForm(f => ({ ...f, phoneNumber: e.target.value }))}
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
+                className="settings-page__modal-input" />
               {!editing && (
                 <input required type="password" placeholder="Password" value={form.password}
                   onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                  className="w-full border rounded-lg px-3 py-2 text-sm" />
+                  className="settings-page__modal-input" />
               )}
               <select value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value as 'Admin' | 'Staff' }))}
-                className="w-full border rounded-lg px-3 py-2 text-sm">
+                className="settings-page__modal-input">
                 <option value="Staff">Staff</option>
                 <option value="Admin">Admin</option>
               </select>
               <div className="space-y-1">
-                <p className="text-xs font-medium text-gray-600 mb-1">Permissions</p>
+                <p className="settings-page__perm-label">Permissions</p>
                 {([ ['canViewEmails', 'View Emails'], ['canViewCalls', 'View Phone Calls'], ['canViewScheduling', 'View Scheduling'] ] as const).map(([key, label]) => (
-                  <label key={key} className="flex items-center gap-2 text-sm">
+                  <label key={key} className="settings-page__perm-item">
                     <input type="checkbox" checked={form[key]}
                       onChange={e => setForm(f => ({ ...f, [key]: e.target.checked }))} />
                     {label}
@@ -219,23 +221,22 @@ function UsersTab() {
                 <button type="button" onClick={() => setShowForm(false)}
                   className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
                 <button type="submit"
-                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save</button>
+                  className="px-4 py-2 text-sm btn-primary rounded-lg">Save</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Reset password modal */}
       {resetTarget && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
-            <h3 className="text-lg font-semibold mb-1">Reset password</h3>
-            <p className="text-sm text-gray-500 mb-4">{resetTarget.email}</p>
+        <div className="settings-page__modal-overlay">
+          <div className="settings-page__modal-panel" style={{ maxWidth: '24rem' }}>
+            <h3 className="settings-page__modal-title">Reset password</h3>
+            <p className="settings-page__modal-subtitle">{resetTarget.email}</p>
             <form onSubmit={handleResetPassword} className="space-y-3">
               <input required type="password" placeholder="New password" value={newPw}
                 onChange={e => setNewPw(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
+                className="settings-page__modal-input" />
               <div className="flex gap-3 justify-end">
                 <button type="button" onClick={() => setResetTarget(null)}
                   className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
@@ -268,62 +269,62 @@ function EmailConfigTab({ settings, onChange }: {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow p-6">
-        <h3 className="font-semibold text-gray-800 mb-4">SendGrid (Outbound Email)</h3>
+      <div className="settings-page__config-card">
+        <h3 className="settings-page__config-title">SendGrid (Outbound Email)</h3>
         <div className="space-y-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">API Key</label>
+            <label className="settings-page__form-label">API Key</label>
             <input value={sg.apiKey} onChange={e => set(['sendGrid', 'apiKey'], e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm font-mono" />
+              className="settings-page__form-input--mono" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">From Email</label>
+              <label className="settings-page__form-label">From Email</label>
               <input value={sg.fromEmail} onChange={e => set(['sendGrid', 'fromEmail'], e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
+                className="settings-page__form-input" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">From Name</label>
+              <label className="settings-page__form-label">From Name</label>
               <input value={sg.fromName} onChange={e => set(['sendGrid', 'fromName'], e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
+                className="settings-page__form-input" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow p-6">
-        <h3 className="font-semibold text-gray-800 mb-4">IMAP (Inbound Email)</h3>
+      <div className="settings-page__config-card">
+        <h3 className="settings-page__config-title">IMAP (Inbound Email)</h3>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Host</label>
+              <label className="settings-page__form-label">Host</label>
               <input value={imap.host} onChange={e => set(['imap', 'host'], e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
+                className="settings-page__form-input" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Port</label>
+              <label className="settings-page__form-label">Port</label>
               <input type="number" value={imap.port} onChange={e => set(['imap', 'port'], Number(e.target.value))}
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
+                className="settings-page__form-input" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Username</label>
+              <label className="settings-page__form-label">Username</label>
               <input value={imap.username} onChange={e => set(['imap', 'username'], e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
+                className="settings-page__form-input" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Password / App Password</label>
+              <label className="settings-page__form-label">Password / App Password</label>
               <input type="password" value={imap.password} onChange={e => set(['imap', 'password'], e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
+                className="settings-page__form-input" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Poll interval (minutes)</label>
+              <label className="settings-page__form-label">Poll interval (minutes)</label>
               <input type="number" value={imap.pollIntervalMinutes}
                 onChange={e => set(['imap', 'pollIntervalMinutes'], Number(e.target.value))}
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
+                className="settings-page__form-input" />
             </div>
             <label className="flex items-center gap-2 text-sm mt-5">
               <input type="checkbox" checked={imap.useSsl}
@@ -349,35 +350,377 @@ function PhoneConfigTab({ settings, onChange }: {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow p-6">
-      <h3 className="font-semibold text-gray-800 mb-4">Twilio</h3>
+    <div className="settings-page__config-card">
+      <h3 className="settings-page__config-title">Twilio</h3>
       <div className="space-y-3">
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Account SID</label>
+          <label className="settings-page__form-label">Account SID</label>
           <input value={tw.accountSid} onChange={e => set('accountSid', e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 text-sm font-mono" />
+            className="settings-page__form-input--mono" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Auth Token</label>
+          <label className="settings-page__form-label">Auth Token</label>
           <input type="password" value={tw.authToken} onChange={e => set('authToken', e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 text-sm font-mono" />
+            className="settings-page__form-input--mono" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">From Phone Number</label>
+            <label className="settings-page__form-label">From Phone Number</label>
             <input value={tw.fromPhoneNumber} onChange={e => set('fromPhoneNumber', e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm" />
+              className="settings-page__form-input" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Public Base URL (ngrok)</label>
+            <label className="settings-page__form-label">Public Base URL (ngrok)</label>
             <input value={tw.publicBaseUrl} onChange={e => set('publicBaseUrl', e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm" />
+              className="settings-page__form-input" />
           </div>
         </div>
-        <p className="text-xs text-gray-400">
+        <p className="settings-page__config-hint">
           Set Public Base URL to your ngrok or production HTTPS URL for Twilio webhook callbacks.
         </p>
       </div>
+    </div>
+  );
+}
+
+// ── Appearance tab ────────────────────────────────────────────────────────────
+
+const COLOR_FIELDS: { key: keyof ThemeFormData; label: string }[] = [
+  { key: 'primary', label: 'Primary' },
+  { key: 'primaryDark', label: 'Primary Dark' },
+  { key: 'primaryLight', label: 'Primary Light' },
+  { key: 'sidebarBg', label: 'Sidebar Background' },
+  { key: 'sidebarActive', label: 'Sidebar Active' },
+  { key: 'sidebarHover', label: 'Sidebar Hover' },
+  { key: 'sidebarText', label: 'Sidebar Text' },
+  { key: 'sidebarSubtext', label: 'Sidebar Subtext' },
+  { key: 'sidebarBorder', label: 'Sidebar Border' },
+  { key: 'pageBg', label: 'Page Background' },
+  { key: 'cardBg', label: 'Card Background' },
+  { key: 'textPrimary', label: 'Text Primary' },
+  { key: 'textMuted', label: 'Text Muted' },
+  { key: 'borderColor', label: 'Border Color' },
+  { key: 'tableHeaderBg', label: 'Table Header Background' },
+  { key: 'inputBg', label: 'Input Background' },
+];
+
+function ThemeFormModal({
+  editing,
+  initialData,
+  onClose,
+  onSaved,
+}: {
+  editing: Theme | null;
+  initialData?: ThemeFormData;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [form, setForm] = useState<ThemeFormData>(() =>
+    editing
+      ? {
+          name: editing.name,
+          slug: editing.slug,
+          isDark: editing.isDark,
+          primary: editing.primary,
+          primaryDark: editing.primaryDark,
+          primaryLight: editing.primaryLight,
+          sidebarBg: editing.sidebarBg,
+          sidebarActive: editing.sidebarActive,
+          sidebarHover: editing.sidebarHover,
+          sidebarText: editing.sidebarText,
+          sidebarSubtext: editing.sidebarSubtext,
+          sidebarBorder: editing.sidebarBorder,
+          pageBg: editing.pageBg,
+          cardBg: editing.cardBg,
+          textPrimary: editing.textPrimary,
+          textMuted: editing.textMuted,
+          borderColor: editing.borderColor,
+          tableHeaderBg: editing.tableHeaderBg,
+          inputBg: editing.inputBg,
+        }
+      : (initialData ?? emptyThemeForm())
+  );
+  const [saving, setSaving] = useState(false);
+
+  const set = (key: keyof ThemeFormData, val: string | boolean) =>
+    setForm(f => ({ ...f, [key]: val }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      if (editing) {
+        await updateTheme(editing.id, form);
+        toast.success('Theme updated');
+      } else {
+        await createTheme(form);
+        toast.success('Theme created');
+      }
+      onSaved();
+    } catch {
+      toast.error('Failed to save theme');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="settings-page__modal-overlay">
+      <div className="settings-page__modal-panel settings-page__modal-panel--wide">
+        <h3 className="settings-page__modal-title">
+          {editing ? `Edit theme: ${editing.name}` : initialData ? 'Import theme' : 'New theme'}
+        </h3>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="settings-page__form-label">Name *</label>
+              <input required value={form.name} onChange={e => set('name', e.target.value)}
+                className="settings-page__modal-input" placeholder="My Theme" />
+            </div>
+            <div>
+              <label className="settings-page__form-label">Slug *</label>
+              <input required value={form.slug}
+                onChange={e => set('slug', e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                className="settings-page__modal-input" placeholder="my-theme"
+                disabled={editing?.isBuiltIn} />
+            </div>
+          </div>
+          <label className="settings-page__perm-item">
+            <input type="checkbox" checked={form.isDark}
+              onChange={e => set('isDark', e.target.checked)} />
+            Dark theme (enables dark-mode overrides for Tailwind utility classes)
+          </label>
+          <div className="settings-page__color-grid">
+            {COLOR_FIELDS.map(({ key, label }) => (
+              <div key={key} className="settings-page__color-field">
+                <label className="settings-page__form-label">{label}</label>
+                <div className="settings-page__color-input-wrap">
+                  <input
+                    type="color"
+                    value={(form[key] as string).startsWith('rgba') ? '#888888' : form[key] as string}
+                    onChange={e => set(key, e.target.value)}
+                    className="settings-page__color-picker"
+                  />
+                  <input
+                    value={form[key] as string}
+                    onChange={e => set(key, e.target.value)}
+                    className="settings-page__modal-input settings-page__modal-input--mono"
+                    placeholder="#000000 or rgba(...)"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-3 justify-end pt-2">
+            <button type="button" onClick={onClose}
+              className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+            <button type="submit" disabled={saving}
+              className="px-4 py-2 text-sm btn-primary rounded-lg">
+              {saving ? 'Saving…' : 'Save theme'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+const THEME_JSON_KEYS: (keyof ThemeFormData)[] = [
+  'name', 'slug', 'primary', 'primaryDark', 'primaryLight',
+  'sidebarBg', 'sidebarActive', 'sidebarHover', 'sidebarText', 'sidebarSubtext',
+  'sidebarBorder', 'pageBg', 'cardBg', 'textPrimary', 'textMuted',
+  'borderColor', 'tableHeaderBg', 'inputBg',
+];
+
+function exportThemeJson(t: Theme) {
+  const data: ThemeFormData = {
+    name: t.name, slug: t.slug, isDark: t.isDark,
+    primary: t.primary, primaryDark: t.primaryDark, primaryLight: t.primaryLight,
+    sidebarBg: t.sidebarBg, sidebarActive: t.sidebarActive, sidebarHover: t.sidebarHover,
+    sidebarText: t.sidebarText, sidebarSubtext: t.sidebarSubtext, sidebarBorder: t.sidebarBorder,
+    pageBg: t.pageBg, cardBg: t.cardBg, textPrimary: t.textPrimary, textMuted: t.textMuted,
+    borderColor: t.borderColor, tableHeaderBg: t.tableHeaderBg, inputBg: t.inputBg,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `theme-${t.slug}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function AppearanceTab() {
+  const { activeTheme, activateTheme, refreshTheme } = useTheme();
+  const [themes, setThemes] = useState<Theme[]>([]);
+  const [activating, setActivating] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
+  const [importedData, setImportedData] = useState<ThemeFormData | undefined>(undefined);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const load = () => getThemes().then(setThemes).catch(() => toast.error('Failed to load themes'));
+  useEffect(() => { load(); }, []);
+
+  const handleActivate = async (t: Theme) => {
+    if (activating) return;
+    setActivating(t.id);
+    try {
+      await activateTheme(t.id);
+      load();
+      toast.success(`Theme changed to ${t.name}`);
+    } catch {
+      toast.error('Failed to apply theme');
+    } finally {
+      setActivating('');
+    }
+  };
+
+  const handleDelete = async (t: Theme) => {
+    if (!confirm(`Delete theme "${t.name}"?`)) return;
+    try {
+      await deleteTheme(t.id);
+      load();
+      toast.success('Theme deleted');
+    } catch {
+      toast.error('Failed to delete theme');
+    }
+  };
+
+  const handleSaved = () => {
+    setShowForm(false);
+    setImportedData(undefined);
+    load();
+    refreshTheme();
+  };
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = event => {
+      try {
+        const json = JSON.parse(event.target?.result as string) as Record<string, unknown>;
+        const missing = THEME_JSON_KEYS.filter(k => !json[k]);
+        if (missing.length > 0) {
+          toast.error(`Missing required fields: ${missing.join(', ')}`);
+          return;
+        }
+        const data: ThemeFormData = {
+          name: String(json.name ?? ''),
+          slug: String(json.slug ?? '').toLowerCase().replace(/\s+/g, '-'),
+          isDark: Boolean(json.isDark),
+          primary: String(json.primary ?? ''),
+          primaryDark: String(json.primaryDark ?? ''),
+          primaryLight: String(json.primaryLight ?? ''),
+          sidebarBg: String(json.sidebarBg ?? ''),
+          sidebarActive: String(json.sidebarActive ?? ''),
+          sidebarHover: String(json.sidebarHover ?? ''),
+          sidebarText: String(json.sidebarText ?? ''),
+          sidebarSubtext: String(json.sidebarSubtext ?? ''),
+          sidebarBorder: String(json.sidebarBorder ?? ''),
+          pageBg: String(json.pageBg ?? ''),
+          cardBg: String(json.cardBg ?? ''),
+          textPrimary: String(json.textPrimary ?? ''),
+          textMuted: String(json.textMuted ?? ''),
+          borderColor: String(json.borderColor ?? ''),
+          tableHeaderBg: String(json.tableHeaderBg ?? ''),
+          inputBg: String(json.inputBg ?? ''),
+        };
+        setImportedData(data);
+        setEditingTheme(null);
+        setShowForm(true);
+      } catch {
+        toast.error('Invalid JSON file');
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  };
+
+  return (
+    <div>
+      <div className="settings-page__section-header">
+        <h2 className="settings-page__section-title">Themes</h2>
+        <div className="flex gap-2 items-center">
+          <a href="/theme-sample.json" download="theme-sample.json"
+            className="settings-page__import-link">
+            Download sample JSON
+          </a>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,application/json"
+            onChange={handleImportFile}
+            className="hidden"
+          />
+          <button onClick={() => fileInputRef.current?.click()}
+            className="settings-page__import-btn">
+            Import JSON
+          </button>
+          <button onClick={() => { setImportedData(undefined); setEditingTheme(null); setShowForm(true); }}
+            className="btn-primary px-4 py-2 rounded-lg text-sm">
+            + New theme
+          </button>
+        </div>
+      </div>
+
+      <div className="settings-page__theme-grid">
+        {themes.map(t => (
+          <div key={t.id}
+            className={`settings-page__theme-card ${t.id === activeTheme?.id ? 'settings-page__theme-card--active' : ''}`}>
+            <div className="settings-page__theme-preview">
+              <div className="settings-page__theme-preview-sidebar" style={{ backgroundColor: t.sidebarBg }} />
+              <div className="settings-page__theme-preview-content" style={{ backgroundColor: t.pageBg }}>
+                <div className="settings-page__theme-preview-bar" style={{ backgroundColor: t.primary }} />
+                <div className="settings-page__theme-preview-line" />
+                <div className="settings-page__theme-preview-line" />
+              </div>
+            </div>
+            <div className="settings-page__theme-label">
+              {t.name}
+              {t.isBuiltIn && <span className="settings-page__theme-built-in-badge">built-in</span>}
+              {t.id === activeTheme?.id && <span className="text-primary-color ml-1">✓</span>}
+            </div>
+            <div className="settings-page__theme-actions">
+              {t.id !== activeTheme?.id && (
+                <button onClick={() => handleActivate(t)} disabled={!!activating}
+                  className="settings-page__theme-action-btn settings-page__theme-action-btn--apply">
+                  Apply
+                </button>
+              )}
+              <button onClick={() => { setImportedData(undefined); setEditingTheme(t); setShowForm(true); }}
+                className="settings-page__theme-action-btn">
+                Edit
+              </button>
+              <button onClick={() => exportThemeJson(t)}
+                className="settings-page__theme-action-btn">
+                Export
+              </button>
+              {!t.isBuiltIn && (
+                <button onClick={() => handleDelete(t)}
+                  className="settings-page__theme-action-btn settings-page__theme-action-btn--delete">
+                  Delete
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className="settings-page__theme-hint">
+        The active theme is applied site-wide for all users immediately.
+        Built-in themes can be edited but not deleted. Use Export/Import to share themes as JSON files.
+      </p>
+
+      {showForm && (
+        <ThemeFormModal
+          editing={editingTheme}
+          initialData={importedData}
+          onClose={() => { setShowForm(false); setImportedData(undefined); }}
+          onSaved={handleSaved}
+        />
+      )}
     </div>
   );
 }
@@ -416,17 +759,18 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+    <div className="settings-page">
+      <h1 className="settings-page__title">Settings</h1>
 
-      {/* Tab bar */}
-      <div className="flex gap-1 border-b mb-6">
+      <div className="settings-page__tab-bar">
         <TabButton label="Users" active={tab === 'users'} onClick={() => setTab('users')} />
         <TabButton label="Email Config" active={tab === 'email'} onClick={() => setTab('email')} />
         <TabButton label="Phone Config" active={tab === 'phone'} onClick={() => setTab('phone')} />
+        <TabButton label="Appearance" active={tab === 'appearance'} onClick={() => setTab('appearance')} />
       </div>
 
       {tab === 'users' && <UsersTab />}
+      {tab === 'appearance' && <AppearanceTab />}
 
       {tab === 'email' && (
         settingsLoading
@@ -436,7 +780,7 @@ export default function SettingsPage() {
               <EmailConfigTab settings={settings} onChange={setSettings} />
               <div className="mt-6 flex justify-end">
                 <button onClick={handleSaveSettings} disabled={saving}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50">
+                  className="btn-primary px-6 py-2 rounded-lg text-sm">
                   {saving ? 'Saving…' : 'Save Email Settings'}
                 </button>
               </div>
@@ -452,7 +796,7 @@ export default function SettingsPage() {
               <PhoneConfigTab settings={settings} onChange={setSettings} />
               <div className="mt-6 flex justify-end">
                 <button onClick={handleSaveSettings} disabled={saving}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50">
+                  className="btn-primary px-6 py-2 rounded-lg text-sm">
                   {saving ? 'Saving…' : 'Save Phone Settings'}
                 </button>
               </div>

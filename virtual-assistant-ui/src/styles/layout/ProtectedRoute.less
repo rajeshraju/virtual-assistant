@@ -1,0 +1,13 @@
+@import (reference) '../variables.less';
+
+.layout {
+  display: flex;
+
+  &__main {
+    flex: 1;
+    margin-left: @sidebar-width;
+    min-height: 100vh;
+    padding: @space-6;
+    background-color: var(--page-bg);
+  }
+}

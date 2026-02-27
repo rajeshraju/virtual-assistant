@@ -1,3 +1,28 @@
+export interface Theme {
+  id: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  isBuiltIn: boolean;
+  isDark: boolean;
+  primary: string;
+  primaryDark: string;
+  primaryLight: string;
+  sidebarBg: string;
+  sidebarActive: string;
+  sidebarHover: string;
+  sidebarText: string;
+  sidebarSubtext: string;
+  sidebarBorder: string;
+  pageBg: string;
+  cardBg: string;
+  textPrimary: string;
+  textMuted: string;
+  borderColor: string;
+  tableHeaderBg: string;
+  inputBg: string;
+}
+
 export interface User {
   id: string;
   email: string;

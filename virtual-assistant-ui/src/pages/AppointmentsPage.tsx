@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { getAppointments } from '../api/appointmentsApi';
 import type { Appointment } from '../types';
 import AppointmentModal from '../components/Calendar/AppointmentModal';
+import '../styles/pages/Appointments.less';
 
 const statusColor: Record<string, string> = {
   Scheduled: 'bg-blue-100 text-blue-800',
@@ -21,15 +22,15 @@ export default function AppointmentsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
+      <div className="appointments-page__header">
+        <h1 className="appointments-page__title">Appointments</h1>
         <button onClick={() => setShowNew(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+          className="btn-primary px-4 py-2 rounded-lg text-sm font-medium">
           + New Appointment
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="appointments-page__table-wrap">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wide">
             <tr>
@@ -44,23 +45,25 @@ export default function AppointmentsPage() {
             )}
             {appointments.map(a => (
               <tr key={a.id} onClick={() => setSelected(a)}
-                className="cursor-pointer hover:bg-gray-50 transition-colors">
+                className="appointments-page__row">
                 <td className="px-4 py-3 font-medium text-gray-900">{a.title}</td>
-                <td className="px-4 py-3 text-gray-600">
-                  <div>{a.contactName}</div>
-                  {a.contactPhone && <div className="text-xs text-gray-400">{a.contactPhone}</div>}
+                <td className="px-4 py-3">
+                  <div className="appointments-page__contact-name">{a.contactName}</div>
+                  {a.contactPhone && <div className="appointments-page__contact-phone">{a.contactPhone}</div>}
                 </td>
                 <td className="px-4 py-3 text-gray-600">
                   {format(new Date(a.startTime), 'MMM d, yyyy h:mm aa')}
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${statusColor[a.status] ?? 'bg-gray-100'}`}>
+                  <span className={`appointments-page__status-badge ${statusColor[a.status] ?? 'bg-gray-100'}`}>
                     {a.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-400">
-                  {a.reminderSentSms && <span className="mr-2">SMS ✓</span>}
-                  {a.reminderSentEmail && <span>Email ✓</span>}
+                <td className="px-4 py-3">
+                  <span className="appointments-page__reminder-label">
+                    {a.reminderSentSms && <span className="mr-2">SMS ✓</span>}
+                    {a.reminderSentEmail && <span>Email ✓</span>}
+                  </span>
                 </td>
               </tr>
             ))}

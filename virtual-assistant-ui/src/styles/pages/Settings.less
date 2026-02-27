@@ -1,0 +1,333 @@
+@import (reference) '../variables.less';
+@import '../mixins.less';
+
+.settings-page {
+  max-width: 56rem;
+  margin: 0 auto;
+
+  &__title {
+    .page-title-base();
+  }
+
+  &__tab-bar {
+    display: flex;
+    gap: @space-1;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: @space-6;
+  }
+
+  &__tab-btn {
+    padding: @space-2 @space-4;
+    font-size: @text-sm;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    transition: color @transition-fast, border-color @transition-fast;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+
+    &--active {
+      border-bottom-color: var(--primary);
+      color: var(--primary);
+    }
+  }
+
+  // Users tab
+  &__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: @space-4;
+  }
+
+  &__section-title {
+    font-size: @text-lg;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__table-wrap {
+    .table-wrap-base();
+  }
+
+  &__role-badge {
+    font-size: @text-xs;
+    font-weight: 500;
+    padding: 2px @space-2;
+    border-radius: @radius-sm;
+
+    &--admin { background-color: var(--primary-light); color: var(--primary); }
+    &--staff { background-color: #f3f4f6; color: #4b5563; }
+  }
+
+  // Config cards
+  &__config-card {
+    .card-base();
+    padding: @space-6;
+
+    & + & {
+      margin-top: @space-6;
+    }
+  }
+
+  &__config-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: @space-4;
+  }
+
+  &__config-hint {
+    font-size: @text-xs;
+    color: var(--text-muted);
+    margin-top: @space-2;
+  }
+
+  &__form-label {
+    display: block;
+    font-size: @text-xs;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: @space-1;
+  }
+
+  &__form-input {
+    .form-input-base();
+  }
+
+  &__form-input--mono {
+    .form-input-base();
+    font-family: monospace;
+  }
+
+  // Appearance tab
+  &__theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: @space-4;
+    margin-bottom: @space-4;
+  }
+
+  &__theme-card {
+    .card-base();
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: all @transition-fast;
+
+    &--active {
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  &__theme-preview {
+    display: flex;
+    height: 5rem;
+  }
+
+  &__theme-preview-sidebar {
+    width: 33.33%;
+  }
+
+  &__theme-preview-content {
+    width: 66.67%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__theme-preview-bar {
+    height: 12px;
+    margin: 6px;
+    border-radius: @radius-sm;
+  }
+
+  &__theme-preview-line {
+    height: 8px;
+    margin: 0 6px;
+    margin-top: 4px;
+    border-radius: @radius-sm;
+    background-color: #e5e7eb;
+  }
+
+  &__theme-label {
+    padding: @space-2;
+    font-size: @text-xs;
+    font-weight: 500;
+    text-align: center;
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: @space-1;
+  }
+
+  &__theme-built-in-badge {
+    font-size: 10px;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    padding: 1px 4px;
+    border-radius: @radius-sm;
+  }
+
+  &__theme-actions {
+    display: flex;
+    gap: @space-1;
+    padding: @space-2;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    justify-content: center;
+  }
+
+  &__theme-action-btn {
+    font-size: 11px;
+    padding: 2px @space-2;
+    border-radius: @radius-sm;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    background-color: var(--input-bg);
+    cursor: pointer;
+    transition: all @transition-fast;
+
+    &:hover {
+      color: var(--text-primary);
+      border-color: var(--primary);
+    }
+
+    &--apply {
+      color: var(--primary);
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+
+      &:hover {
+        background-color: var(--primary);
+        color: #fff;
+      }
+    }
+
+    &--delete {
+      &:hover {
+        color: #dc2626;
+        border-color: #dc2626;
+      }
+    }
+  }
+
+  &__theme-hint {
+    font-size: @text-xs;
+    color: var(--text-muted);
+    margin-top: @space-4;
+  }
+
+  &__import-link {
+    font-size: @text-sm;
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color @transition-fast;
+
+    &:hover {
+      color: var(--primary);
+    }
+  }
+
+  &__import-btn {
+    font-size: @text-sm;
+    padding: @space-2 @space-4;
+    border-radius: @radius-lg;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    background-color: var(--input-bg);
+    cursor: pointer;
+    transition: all @transition-fast;
+
+    &:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+  }
+
+  // Theme form modal extras
+  &__modal-panel--wide {
+    max-width: 48rem;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  &__modal-input--mono {
+    font-family: monospace;
+    font-size: @text-sm;
+  }
+
+  &__color-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: @space-3;
+  }
+
+  &__color-field {
+    display: flex;
+    flex-direction: column;
+    gap: @space-1;
+  }
+
+  &__color-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: @space-2;
+  }
+
+  &__color-picker {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border-color);
+    border-radius: @radius-sm;
+    padding: 2px;
+    background-color: var(--input-bg);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  // Modals (user create/edit, password reset)
+  &__modal-overlay {
+    .modal-overlay-base();
+  }
+
+  &__modal-panel {
+    .modal-panel-base();
+    padding: @space-6;
+  }
+
+  &__modal-title {
+    font-size: @text-lg;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: @space-4;
+  }
+
+  &__modal-subtitle {
+    font-size: @text-sm;
+    color: var(--text-muted);
+    margin-bottom: @space-4;
+  }
+
+  &__modal-input {
+    .form-input-base();
+  }
+
+  &__perm-label {
+    font-size: @text-xs;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: @space-1;
+  }
+
+  &__perm-item {
+    display: flex;
+    align-items: center;
+    gap: @space-2;
+    font-size: @text-sm;
+    color: var(--text-primary);
+  }
+}

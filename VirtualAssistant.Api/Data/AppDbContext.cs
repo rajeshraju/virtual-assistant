@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<EmailLog> EmailLogs => Set<EmailLog>();
     public DbSet<ReminderLog> ReminderLogs => Set<ReminderLog>();
     public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
+    public DbSet<Theme> Themes => Set<Theme>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -102,6 +103,30 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(r => r.SentTo).HasMaxLength(256).IsRequired();
             e.Property(r => r.Status).HasMaxLength(50).IsRequired();
             e.HasOne(r => r.Appointment).WithMany(a => a.ReminderLogs).HasForeignKey(r => r.AppointmentId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Theme>(e =>
+        {
+            e.HasKey(t => t.Id);
+            e.HasIndex(t => t.Slug).IsUnique();
+            e.Property(t => t.Name).HasMaxLength(100).IsRequired();
+            e.Property(t => t.Slug).HasMaxLength(100).IsRequired();
+            e.Property(t => t.Primary).HasMaxLength(50).IsRequired();
+            e.Property(t => t.PrimaryDark).HasMaxLength(50).IsRequired();
+            e.Property(t => t.PrimaryLight).HasMaxLength(50).IsRequired();
+            e.Property(t => t.SidebarBg).HasMaxLength(50).IsRequired();
+            e.Property(t => t.SidebarActive).HasMaxLength(50).IsRequired();
+            e.Property(t => t.SidebarHover).HasMaxLength(50).IsRequired();
+            e.Property(t => t.SidebarText).HasMaxLength(50).IsRequired();
+            e.Property(t => t.SidebarSubtext).HasMaxLength(50).IsRequired();
+            e.Property(t => t.SidebarBorder).HasMaxLength(100).IsRequired();
+            e.Property(t => t.PageBg).HasMaxLength(50).IsRequired();
+            e.Property(t => t.CardBg).HasMaxLength(50).IsRequired();
+            e.Property(t => t.TextPrimary).HasMaxLength(50).IsRequired();
+            e.Property(t => t.TextMuted).HasMaxLength(50).IsRequired();
+            e.Property(t => t.BorderColor).HasMaxLength(50).IsRequired();
+            e.Property(t => t.TableHeaderBg).HasMaxLength(50).IsRequired();
+            e.Property(t => t.InputBg).HasMaxLength(50).IsRequired();
         });
     }
 }

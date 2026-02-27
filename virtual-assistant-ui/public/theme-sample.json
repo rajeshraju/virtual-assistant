@@ -1,0 +1,21 @@
+{
+  "name": "My Custom Theme",
+  "slug": "my-custom-theme",
+  "isDark": false,
+  "primary": "#2563eb",
+  "primaryDark": "#1d4ed8",
+  "primaryLight": "#eff6ff",
+  "sidebarBg": "#111827",
+  "sidebarActive": "#2563eb",
+  "sidebarHover": "#1f2937",
+  "sidebarText": "#d1d5db",
+  "sidebarSubtext": "#9ca3af",
+  "sidebarBorder": "rgba(255,255,255,0.1)",
+  "pageBg": "#f9fafb",
+  "cardBg": "#ffffff",
+  "textPrimary": "#111827",
+  "textMuted": "#6b7280",
+  "borderColor": "#e5e7eb",
+  "tableHeaderBg": "#f9fafb",
+  "inputBg": "#ffffff"
+}

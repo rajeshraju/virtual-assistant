@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { login } from '../api/authApi';
 import toast from 'react-hot-toast';
+import '../styles/auth/AuthPages.less';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -26,27 +27,27 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Virtual Assistant Login</h1>
+    <div className="auth-page">
+      <div className="auth-page__card">
+        <h1 className="auth-page__title">Virtual Assistant Login</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="auth-page__label">Email</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="auth-page__input" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="auth-page__label">Password</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="auth-page__input" />
           </div>
           <button type="submit" disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium disabled:opacity-50">
+            className="w-full btn-primary py-2 px-4 rounded-lg font-medium">
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
-        <p className="mt-4 text-sm text-gray-600 text-center">
-          No account? <Link to="/register" className="text-blue-600 hover:underline">Register</Link>
+        <p className="auth-page__footer">
+          No account? <Link to="/register" className="auth-page__link">Register</Link>
         </p>
       </div>
     </div>

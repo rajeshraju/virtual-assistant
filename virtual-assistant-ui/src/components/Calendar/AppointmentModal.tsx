@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import type { Appointment } from '../../types';
 import { createAppointment, updateAppointment, deleteAppointment, sendReminder, rescheduleAppointment } from '../../api/appointmentsApi';
 import toast from 'react-hot-toast';
+import '../../styles/components/AppointmentModal.less';
 
 interface Props {
   appointment?: Appointment | null;
@@ -98,26 +99,26 @@ export default function AppointmentModal({ appointment, defaultStart, defaultEnd
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="font-semibold text-lg">{isEdit ? 'Edit Appointment' : 'New Appointment'}</h2>
+    <div className="appt-modal__overlay">
+      <div className="appt-modal__panel">
+        <div className="appt-modal__header">
+          <h2 className="appt-modal__title">{isEdit ? 'Edit Appointment' : 'New Appointment'}</h2>
           {isEdit && (
-            <div className="flex gap-2 text-sm">
+            <div className="appt-modal__mode-tabs">
               <button onClick={() => setMode('edit')}
-                className={`px-3 py-1 rounded-lg ${mode === 'edit' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-100'}`}>
+                className={`appt-modal__mode-tab ${mode === 'edit' ? 'appt-modal__mode-tab--edit' : ''}`}>
                 Edit
               </button>
               <button onClick={() => setMode('reschedule')}
-                className={`px-3 py-1 rounded-lg ${mode === 'reschedule' ? 'bg-yellow-100 text-yellow-700' : 'text-gray-500 hover:bg-gray-100'}`}>
+                className={`appt-modal__mode-tab ${mode === 'reschedule' ? 'appt-modal__mode-tab--reschedule' : ''}`}>
                 Reschedule
               </button>
             </div>
           )}
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 ml-4 text-xl">×</button>
+          <button onClick={onClose} className="appt-modal__close">×</button>
         </div>
 
-        <div className="px-6 py-4 space-y-4">
+        <div className="appt-modal__body space-y-4">
           <Field label="Title *" value={form.title} onChange={set('title')} />
           <div className="grid grid-cols-2 gap-4">
             <Field label="Start Time *" type="datetime-local" value={form.startTime} onChange={set('startTime')} />
@@ -131,49 +132,49 @@ export default function AppointmentModal({ appointment, defaultStart, defaultEnd
                 <Field label="Contact Phone" type="tel" value={form.contactPhone} onChange={set('contactPhone')} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Remind before (minutes)</label>
+                <label className="appt-modal__label">Remind before (minutes)</label>
                 <select value={form.reminderMinutesBefore} onChange={set('reminderMinutesBefore')}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  className="appt-modal__select">
                   {[15, 30, 60, 120, 1440].map(v => (
                     <option key={v} value={v}>{v < 60 ? `${v} min` : v === 1440 ? '1 day' : `${v / 60} hr`}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="appt-modal__label">Description</label>
                 <textarea value={form.description} onChange={set('description')} rows={2}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+                  className="appt-modal__textarea" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <label className="appt-modal__label">Notes</label>
                 <textarea value={form.notes} onChange={set('notes')} rows={2}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+                  className="appt-modal__textarea" />
               </div>
             </>
           )}
         </div>
 
-        <div className="px-6 py-4 border-t flex gap-3 justify-between">
-          <div className="flex gap-2">
+        <div className="appt-modal__footer">
+          <div className="appt-modal__footer-left">
             {isEdit && (
               <>
                 <button onClick={handleDelete} disabled={loading}
-                  className="text-sm px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg">
+                  className="appt-modal__delete-btn">
                   Cancel Appt
                 </button>
                 <button onClick={handleReminder}
-                  className="text-sm px-3 py-2 text-purple-600 hover:bg-purple-50 rounded-lg">
+                  className="appt-modal__reminder-btn">
                   Send Reminder
                 </button>
               </>
             )}
           </div>
-          <div className="flex gap-3">
+          <div className="appt-modal__footer-right">
             <button onClick={onClose} className="text-sm px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">
               Close
             </button>
             <button onClick={handleSave} disabled={loading}
-              className="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50">
+              className="text-sm px-4 py-2 btn-primary rounded-lg">
               {loading ? 'Saving…' : mode === 'reschedule' ? 'Reschedule' : 'Save'}
             </button>
           </div>
@@ -189,9 +190,9 @@ function Field({ label, type = 'text', value, onChange }: {
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="appt-modal__label">{label}</label>
       <input type={type} value={value} onChange={onChange}
-        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        className="appt-modal__input" />
     </div>
   );
 }

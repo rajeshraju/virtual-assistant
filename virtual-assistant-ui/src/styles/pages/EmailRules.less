@@ -1,0 +1,125 @@
+@import (reference) '../variables.less';
+@import '../mixins.less';
+
+.email-rules-page {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: @space-6;
+  }
+
+  &__title {
+    font-size: @text-2xl;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  &__empty {
+    font-size: @text-sm;
+    color: var(--text-muted);
+  }
+
+  &__rule-card {
+    .card-base();
+    padding: @space-4;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: @space-4;
+  }
+
+  &__rule-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: @radius-full;
+    flex-shrink: 0;
+    margin-top: 6px;
+
+    &--active  { background-color: #22c55e; }
+    &--inactive { background-color: #d1d5db; }
+  }
+
+  &__rule-name {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  &__rule-priority {
+    font-size: @text-xs;
+    color: var(--text-muted);
+  }
+
+  &__rule-desc {
+    font-size: @text-sm;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  &__rule-preview {
+    font-size: @text-xs;
+    color: var(--text-muted);
+    margin-top: @space-1;
+  }
+
+  // Edit modal
+  &__modal-overlay {
+    .modal-overlay-base();
+  }
+
+  &__modal-panel {
+    .modal-panel-base();
+    max-width: 32rem;
+  }
+
+  &__modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: @space-4 @space-6;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  &__modal-title {
+    font-size: @text-lg;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__modal-body {
+    padding: @space-4 @space-6;
+  }
+
+  &__modal-footer {
+    padding: @space-4 @space-6;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: @space-3;
+  }
+
+  &__label {
+    .form-label-base();
+  }
+
+  &__input {
+    .form-input-base();
+  }
+
+  &__select {
+    .form-input-base();
+    cursor: pointer;
+  }
+
+  &__textarea {
+    .form-input-base();
+    font-family: monospace;
+    resize: vertical;
+  }
+
+  &__hint {
+    font-size: @text-xs;
+    color: var(--text-muted);
+    margin-top: @space-1;
+  }
+}

@@ -2,6 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import Sidebar from './Sidebar';
 import type { User } from '../../types';
+import '../../styles/layout/ProtectedRoute.less';
 
 type Permission = 'canViewEmails' | 'canViewCalls' | 'canViewScheduling';
 
@@ -27,9 +28,9 @@ export default function ProtectedRoute({ children, permission, adminOnly }: Prop
   if (permission && user && !(user as User)[permission]) return <Navigate to="/dashboard" replace />;
 
   return (
-    <div className="flex">
+    <div className="layout">
       <Sidebar />
-      <main className="flex-1 ml-64 min-h-screen p-6 bg-gray-50">
+      <main className="layout__main">
         {children}
       </main>
     </div>
